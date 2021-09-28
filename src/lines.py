@@ -94,7 +94,7 @@ def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "l
         qe = qe + dqe
         qc = qc + dqc
     
-    output = list(map(vertex.ndarray_to_vertex, output))
+    output = list(map(lambda x: vertex.ndarray_to_vertex(x, is_rounded=False), output))
     return output
 
 def dda_on_vertex(p1: vertex.Vertex, p2: vertex.Vertex, step_in_y: bool = False) -> "list[vertex.Vertex]":

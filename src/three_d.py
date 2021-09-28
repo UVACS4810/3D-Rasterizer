@@ -29,7 +29,6 @@ def transform_vertex(point: vertex.Vertex, draw_data: utils.DrawData) -> vertex.
     # apply a viewport transformation
     copy_point.x = (copy_point.x + 1) * draw_data.width/2
     copy_point.y = (copy_point.y + 1) * draw_data.height/2
-    print(copy_point)
     return copy_point
 
 def draw_3d_triangle(image: Image, draw_data: utils.DrawData, i1: vertex.Vertex, i2: vertex.Vertex, i3: vertex.Vertex):
@@ -43,6 +42,7 @@ def draw_3d_triangle(image: Image, draw_data: utils.DrawData, i1: vertex.Vertex,
     # Only continue with those pixels that are on the screen and 
     # have z between 0 and 1. 
     for pixel in pixels:
+        print(pixel)
         # check x
         if not 0 <= pixel.x < draw_data.width:
             continue
@@ -53,10 +53,12 @@ def draw_3d_triangle(image: Image, draw_data: utils.DrawData, i1: vertex.Vertex,
         if not draw_data.near <= pixel.z <= draw_data.far:
             continue
         # check depth buffer
-        if draw_data.depth_buffer[(pixel.y, pixel.x)] < pixel.z:
+        if draw_data.depth_buffer[(int(pixel.y), int(pixel.x))] < pixel.z:
             continue
         # Set the pixel and depth buffer values
-        draw_data.depth_buffer[(pixel.y, pixel.x)] = pixel.z
+        if pixel.z > 0:
+            print(pixel)
+        draw_data.depth_buffer[(int(pixel.y), int(pixel.x))] = pixel.z
         color: utils.RGB = draw_data.color.as_rgb(rounded=True)
 
-        image.im.putpixel((pixel.x, pixel.y), (color.r, color.g, color.b, color.a))
+        image.im.putpixel((int(pixel.x), int(pixel.y)), (color.r, color.g, color.b, color.a))
