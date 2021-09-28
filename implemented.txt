@@ -5,3 +5,10 @@ hw2loadmv.txt
 hw2loadp.txt
 hw2pixelclip.txt
 hw2trig.txt
+hw2translate.txt
+hw2rotatex.txt
+hw2rotate.txt
+hw2scale.txt
+hw2multmv.txt
+hw2trig.txt
+hw2screenclip.txt
