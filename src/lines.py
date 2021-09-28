@@ -5,17 +5,7 @@ import numpy as np
 import src.vertex as vertex
 import src.utils as utils
 
-def ndarray_to_vertex(q: np.ndarray, is_rounded: bool = True) -> vertex.Vertex:
-    if is_rounded:
-        return vertex.Vertex(
-                *(np.round(q.tolist()).astype(int))
-            )
-    return vertex.Vertex(
-        *(q.tolist())
-    )
 
-def vertex_to_ndarray(v: vertex.Vertex) -> np.ndarray:
-    return np.array(utils.object_to_list(v))
 
 def change_and_starting_position(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.ndarray]":
     delta_p: np.ndarray = p2 - p1
@@ -80,12 +70,12 @@ def dda(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.nda
         q = q + dp
     return output_list
 
-def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "list[np.ndarray]":
+def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "list[vertex.Vertex]":
     # The first step is to order to 3 vertexes by their y coordinate.
     a = [p1, p2, p3]
     a.sort(key=lambda v: v.y)
     # convert a to a list of ndarrays
-    a = list(map(vertex_to_ndarray, a))
+    a = list(map(lambda x: x.as_ndarray(), a))
     # bottom, middle, top
     pb, pm, pt = a
     # Find d~p and initial ~q for (~pb, ~pm); call them d~qa and ~qa
@@ -104,14 +94,14 @@ def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "l
         qe = qe + dqe
         qc = qc + dqc
     
-    output = list(map(ndarray_to_vertex, output))
+    output = list(map(vertex.ndarray_to_vertex, output))
     return output
 
 def dda_on_vertex(p1: vertex.Vertex, p2: vertex.Vertex, step_in_y: bool = False) -> "list[vertex.Vertex]":
     p1_list: np.ndarray = np.array(utils.object_to_list(p1))
     p2_list: np.ndarray = np.array(utils.object_to_list(p2))
     dda_result = dda(p1_list, p2_list, step_in_y)
-    output = list(map(ndarray_to_vertex, dda_result))
+    output = list(map(vertex.ndarray_to_vertex, dda_result))
     return output
 
 # performs linear interpolation between two np.ndarrays

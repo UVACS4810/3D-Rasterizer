@@ -27,6 +27,12 @@ class TestVertex(unittest.TestCase):
         fields = [r, g, b, x, y]
         for field in fields:
             self.assertIn(field, p1_as_list)
+    
+    def test_as_ndarray(self):
+        v = vertex.Vertex(1,1)
+        l = [1,1,0,0,0]
+        ll = np.array(l)
+        self.assertEqual(ll.all(), v.as_ndarray().all())
 
 class TestUtils(unittest.TestCase):
     def test_convert_hex_to_rgb(self):
@@ -115,6 +121,12 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(draw_data_orig.model_view.all(), draw_data_updated.model_view.all())
         self.assertEqual(draw_data_orig.projection.all(), draw_data_updated.projection.all())
 
+    def test_draw_data_init(self):
+        h = 20
+        w = 10
+        dd = utils.DrawData([], h, w)
+        expected_db = np.ones((h, w))
+        self.assertEqual(np.shape(dd.depth_buffer), np.shape(expected_db))
 
 class TestFileParse(unittest.TestCase):
     def test_line_to_list(self):
@@ -191,11 +203,6 @@ class TestLines(unittest.TestCase):
         actual = lines.dda_on_vertex(p1, p2)
         self.assertEqual(actual, expected)
 
-    def test_vertex_to_ndarray(self):
-        v = vertex.Vertex(1,1)
-        l = [1,1,0,0,0]
-        ll = np.array(l)
-        self.assertEqual(ll.all(), lines.vertex_to_ndarray(v).all())
 
     def test_triangle_fill(self):
         p1 = vertex.Vertex(1,1)

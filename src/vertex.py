@@ -1,7 +1,9 @@
 
 import dataclasses
 
-from src.utils import RGB, convert_hex_to_rgb
+import numpy as np
+
+import src.utils as utils
 
 @dataclasses.dataclass
 class Vertex():
@@ -13,8 +15,22 @@ class Vertex():
     g: int = 0
     b: int = 0
     a: int = 255
+
     def __iter__(self):
         return self
+    def as_ndarray(self) -> np.ndarray:
+        return np.array(utils.object_to_list(self))
+    def position_data(self) -> np.ndarray:
+        return np.array([self.x, self.y, self.z, self.w])
+
+def ndarray_to_vertex(q: np.ndarray, is_rounded: bool = True) -> Vertex:
+    if is_rounded:
+        return Vertex(
+                *(np.round(q.tolist()).astype(int))
+            )
+    return Vertex(
+        *(q.tolist())
+    )
 
 def parse_xyrgb(line: "list[str]") -> Vertex:
     x = float(line[1])

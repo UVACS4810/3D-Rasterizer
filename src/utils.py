@@ -1,4 +1,5 @@
 import dataclasses
+import math
 from typing import Any
 
 from PIL import Image
@@ -62,7 +63,12 @@ class DrawData():
     width: int
     model_view: np.ndarray = np.identity(4)
     projection: np.ndarray = np.identity(4)
-    color: RGBFloat = RGBFloat(0.0, 0.0, 0.0)
+    color: RGBFloat = RGBFloat(1.0, 1.0, 1.0)
+    near = 0
+    far = 1
+    depth_buffer: np.ndarray = dataclasses.field(init=False)
+    def __post_init__(self):
+        self.depth_buffer = np.full((self.height, self.width), math.inf)
 
     def clear(self):
         """Used to wipe info that will not cary over to the next image in the animation
@@ -70,7 +76,7 @@ class DrawData():
         self.vertex_list.clear()
         self.model_view = np.identity(4)
         self.projection = np.identity(4)
-        self.color = RGBFloat(0.0, 0.0, 0.0)
+        self.color = RGBFloat(1.0, 1.0, 1.0)
 
 def over_operator(ca: int, cb: int, aa: int, ab, a0: int) -> int:
     return round((ca * aa + cb*ab*(1-aa))/a0)
