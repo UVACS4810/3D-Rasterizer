@@ -4,3 +4,4 @@ hw2depth.txt
 hw2loadmv.txt
 hw2loadp.txt
 hw2pixelclip.txt
+hw2trig.txt

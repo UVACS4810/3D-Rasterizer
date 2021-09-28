@@ -7,7 +7,7 @@ import src.utils as utils
 
 
 
-def change_and_starting_position(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.ndarray]":
+def change_and_starting_position(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False, width: float = math.inf, height: float = math.inf) -> "list[np.ndarray]":
     delta_p: np.ndarray = p2 - p1
     # if delta y > delta x then we will step in y, else, step in x
     if not step_in_y:
@@ -27,7 +27,7 @@ def change_and_starting_position(p1: np.ndarray, p2: np.ndarray, step_in_y: bool
     else:
         dp = np.zeros(delta_p.shape)
     # the amount added to the initial point to get to the first int larger in the step direction
-    dp0 = (math.ceil(p1[step_index]) - p1[step_index]) * dp
+    dp0 = (math.ceil(p1[step_index]) - p1[step_index]) * dp if p1[step_index] > 0 else (0 - p1[step_index]) * dp
     # q is our starting point
     q: np.ndarray = p1 + dp0
     return [dp, q]
@@ -36,7 +36,8 @@ def dda(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.nda
     """Takes in two numpy arrays. Assumes that the first and second value in the arrays are
     x and y respectively. Setting the step_in_y flag will make sure the algorithm always 
     choses to step in y.
-
+    width = the width of the screen to render the image on
+    height = the height of the screen to render the image on
     Returns:
         np.ndarray: a numpy array where the first value is x and the second value is y
     """
@@ -48,6 +49,7 @@ def dda(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.nda
     # set the step index
     # TODO: Is it ok to assume the first value will always be x and the second value will always be y?
     step_index: int = 1 if step_in_y else 0
+    # the edge where we will stop dda
     # We need to ensure that we are moving from a lower point to a higher point in our step directio
     if delta_p[step_index] < 0:
         # swap p1, p2
@@ -61,6 +63,7 @@ def dda(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.nda
         dp = np.zeros(delta_p.shape)
     # the amount added to the initial point to get to the first int larger in the step direction
     dp0 = (math.ceil(p1[step_index]) - p1[step_index]) * dp
+    
     # q is our starting point
     q: np.ndarray = p1 + dp0
     output_list: list[vertex.Vertex] = []
@@ -70,7 +73,7 @@ def dda(p1: np.ndarray, p2: np.ndarray, step_in_y: bool = False) -> "list[np.nda
         q = q + dp
     return output_list
 
-def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "list[vertex.Vertex]":
+def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex, width: float = math.inf, height: float = math.inf) -> "list[vertex.Vertex]":
     # The first step is to order to 3 vertexes by their y coordinate.
     a = [p1, p2, p3]
     a.sort(key=lambda v: v.y)
@@ -79,21 +82,20 @@ def triangle_fill(p1: vertex.Vertex, p2: vertex.Vertex, p3: vertex.Vertex) -> "l
     # bottom, middle, top
     pb, pm, pt = a
     # Find d~p and initial ~q for (~pb, ~pm); call them d~qa and ~qa
-    dqa, qa = change_and_starting_position(pb, pm, True)
+    dqa, qa = change_and_starting_position(pb, pm, True, width, height)
     # Find d~p and initial ~q for (~pb, ~pt); call them d~qc and ~qc
-    dqc, qc = change_and_starting_position(pb, pt, True)
+    dqc, qc = change_and_starting_position(pb, pt, True, width, height)
     output = []
-    while qa[1] < pm[1]:
+    while qa[1] < pm[1] and qa[1] < height:
         output += dda(qa, qc)
         qa = qa + dqa
         qc = qc + dqc
     # Find d~p and initial ~q for (~pm, ~pt); call them d~qe and ~qe
-    dqe, qe = change_and_starting_position(pm, pt, True)
-    while qe[1] < pt[1]:
+    dqe, qe = change_and_starting_position(pm, pt, True, width, height)
+    while qe[1] < pt[1] and qe[1] < height:
         output += dda(qe, qc)
         qe = qe + dqe
         qc = qc + dqc
-    
     output = list(map(lambda x: vertex.ndarray_to_vertex(x, is_rounded=False), output))
     return output
 

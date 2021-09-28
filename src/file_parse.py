@@ -51,22 +51,19 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.DrawData) -> No
     \b loadp a11 a12 ... a44
     """
     keyword: str = line[0]
-
+    ### DRAW DATA UPDATES ###
     if keyword == "xyz":
         new_vertex: vertex.Vertex = vertex.Vertex(
             x=float(line[1]),
             y=float(line[2]),
-            z=float(line[3])
+            z=float(line[3]),
+            r=draw_data.color.r,
+            g=draw_data.color.g,
+            b=draw_data.color.b,
+            a=draw_data.color.a,
         )
         draw_data.vertex_list.append(new_vertex)
 
-    if keyword == "trif":
-        i1, i2, i3 = line[1:4]
-        p1 = get_vertex_by_index(draw_data.vertex_list, i1)
-        p2 = get_vertex_by_index(draw_data.vertex_list, i2)
-        p3 = get_vertex_by_index(draw_data.vertex_list, i3)
-        three_d.draw_3d_triangle(image, draw_data, p1, p2, p3)
-    
     if keyword == "color":
         r = float(line[1])
         g = float(line[2])
@@ -80,3 +77,20 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.DrawData) -> No
     if keyword == "loadp":
         # Take the 1x16 list and turn it into a 4x4 ndarray
         draw_data.projection = np.asarray(line[1:], float).reshape(4,4)
+    
+    ### DRAWING TRIANGLES ###
+    if keyword == "trif":
+        i1, i2, i3 = line[1:4]
+        p1 = get_vertex_by_index(draw_data.vertex_list, i1)
+        p2 = get_vertex_by_index(draw_data.vertex_list, i2)
+        p3 = get_vertex_by_index(draw_data.vertex_list, i3)
+        three_d.draw_3d_triangle(image, draw_data, p1, p2, p3)
+    
+    if keyword == "trig":
+        i1, i2, i3 = line[1:4]
+        p1 = get_vertex_by_index(draw_data.vertex_list, i1)
+        p2 = get_vertex_by_index(draw_data.vertex_list, i2)
+        p3 = get_vertex_by_index(draw_data.vertex_list, i3)
+        three_d.draw_3d_triangle(image, draw_data, p1, p2, p3, gouraud=True)
+    
+    ### MATRIX MANIPULATION ###
