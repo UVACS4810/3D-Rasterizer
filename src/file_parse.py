@@ -165,23 +165,37 @@ def parse_line(line: "list[str]", image: Image, draw_data: utils.DrawData) -> No
         assert len(line) == 17
         draw_data.model_view = np.matmul(draw_data.model_view, np.asarray(line[1:], float).reshape(4,4))
 
-    # elif keyword == "rotate":
-    #     # Info about the rotation matrix taken from 
-    #     # http://www.songho.ca/opengl/gl_matrix.html and 
-    #     # https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glRotate.xml
-    #     assert len(line) == 5
-    #     # radians we will rotate counter-clockwise
-    #     theta = math.radians(float(line[1]))
-    #     # x, y, and z components of our rotation vector
-    #     x = float(line[2])
-    #     y = float(line[3])
-    #     z = float(line[4])
-    #     ## The first step is to normalize the vector
-    #     length = math.sqrt(x^2 + y^2 + z^2)
-    #     x = x/length
-    #     y = y/length
-    #     z = z/length
-    #     # Now that we have a normalized vector, we will compute the sin and cos of our angle
-    #     c = math.cos(theta)
-    #     s = math.sin(theta)
+    elif keyword == "rotate":
+        # Info about the rotation matrix taken from 
+        # http://www.songho.ca/opengl/gl_matrix.html and 
+        # https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/glRotate.xml
+        assert len(line) == 5
+        # radians we will rotate counter-clockwise
+        theta = math.radians(float(line[1]))
+        # x, y, and z components of our rotation vector
+        x = float(line[2])
+        y = float(line[3])
+        z = float(line[4])
+        ## The first step is to normalize the vector
+        length = math.sqrt(x*x + y*y + z*z)
+        x = x/length
+        y = y/length
+        z = z/length
+        print(f"normal = {x * y * z}. Length = {length}")
+        # Now that we have a normalized vector, we will compute the sin and cos of our angle
+        c = math.cos(theta)
+        s = math.sin(theta)
+        rotation_matrix = np.identity(4)
+        rotation_matrix[0,0] = (1-c)*(x*x) + c
+        rotation_matrix[0,1] = (1-c)*(x*y) - (s*z)
+        rotation_matrix[0,2] = (1-c)*(x*z) + (s*y)
 
+        rotation_matrix[1,0] = (1-c)*(x*y) + (s*z)
+        rotation_matrix[1,1] = (1-c)*(y*y) + c
+        rotation_matrix[1,2] = (1-c)*(y*z) - (s*x)
+
+        rotation_matrix[2,0] = (1-c)*(x*z) - (s*y)
+        rotation_matrix[2,1] = (1-c)*(y*z) + (s*x)
+        rotation_matrix[2,2] = (1-c)*(z*z) + c
+
+        draw_data.model_view = np.matmul(draw_data.model_view, rotation_matrix)
