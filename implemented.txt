@@ -1,0 +1,6 @@
+hw2trif.txt
+hw2color.txt
+hw2depth.txt
+hw2loadmv.txt
+hw2loadp.txt
+hw2pixelclip.txt

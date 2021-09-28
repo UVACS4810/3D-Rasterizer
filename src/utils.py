@@ -46,14 +46,15 @@ class RGBFloat():
     b: float
     a: float = 1.0
 
-    def as_rgb(self) -> RGB:
-        return RGB(
-            r=max(0, min(255, self.r * 255)),
-            g=max(0, min(255, self.g * 255)),
-            b=max(0, min(255, self.b * 255)),
-            a=max(0, min(255, self.a * 255)),
-        )
-
+    def as_rgb(self, rounded = False) -> RGB:
+        r = max(0, min(255, self.r * 255))
+        g = max(0, min(255, self.g * 255))
+        b = max(0, min(255, self.b * 255))
+        a = max(0, min(255, self.a * 255))
+        if rounded:
+            return RGB(round(r), round(g), round(b), round(a))
+        else:
+            return RGB(r, g, b, a)
 @dataclasses.dataclass
 class DrawData():
     """contains information that will need to last for the lifecycle of the image
@@ -68,7 +69,7 @@ class DrawData():
     far = 1
     depth_buffer: np.ndarray = dataclasses.field(init=False)
     def __post_init__(self):
-        self.depth_buffer = np.full((self.height, self.width), math.inf)
+        self.depth_buffer = np.ones((self.height, self.width))
 
     def clear(self):
         """Used to wipe info that will not cary over to the next image in the animation
